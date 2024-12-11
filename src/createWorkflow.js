@@ -25,9 +25,7 @@ function createWorkflow(projectDir, options) {
   }
 
   if (onEvents.length === 0) {
-    console.log(
-      "You must select at least one event type: --on-push or --on-pull-request"
-    );
+    onEvents.push("pull_request");
     return;
   }
 

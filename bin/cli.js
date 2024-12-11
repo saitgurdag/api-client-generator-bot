@@ -10,7 +10,7 @@ program
   .description("Add Api Client Generator bot to the project")
   .option("--on-push", "Create to run on push event")
   .option("--on-pull-request", "Create to run on pull request event")
-  .option("--branch <branch>", "Branch name to open PR (default: main)", "main") // branch parametresi
+  .option("--branch <branch>", "Branch name to open PR (default: main)", "main")
   .option(
     "--path <swagger-url>",
     "The path of the Swagger JSON file cannot be empty",

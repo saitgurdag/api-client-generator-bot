@@ -1,15 +1,34 @@
 {
-  "name": "my-github-action-package",
+  "name": "api-client-generator-bot",
+  "description": "A package to create GitHub Actions Bot for generating API client code from Swagger definition.",
   "version": "1.0.0",
   "main": "index.js",
   "bin": {
-    "my-github-action-package": "./bin/cli.js"
+    "api-client-generator-bot": "./bin/cli.js"
   },
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish",
     "install": "node ./bin/cli.js install",
     "uninstall": "node ./bin/cli.js uninstall"
   },
+  "keywords": [
+    "github-actions",
+    "swagger",
+    "workflow",
+    "api-client"
+  ],
+  "author": "saitgurdag",
+  "license": "MIT",
   "dependencies": {
-    "commander": "^10.0.0"
+    "commander": "^10.0.0",
+    "fs-extra": "^10.1.0",
+    "path": "^0.12.7",
+    "yaml": "^2.0.2",
+    "axios": "^1.2.0"
+  },
+    "devDependencies": {
+    "eslint": "^8.23.1",
+    "prettier": "^2.7.1"
   }
 }
