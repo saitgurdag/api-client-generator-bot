@@ -3,7 +3,11 @@ const path = require("path");
 const { ensureDirectoryExists } = require("./workflowHelpers");
 
 function createWorkflow(projectDir, options) {
-  if (!options.path || options.path === "") {
+  if (
+    !options.setPath &&
+    !options.setBranch &&
+    (!options.path || options.path === "")
+  ) {
     console.log("Swagger URL (--path) cannot be empty.");
     return;
   }
