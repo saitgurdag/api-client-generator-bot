@@ -8,6 +8,31 @@ function createWorkflow(projectDir, options) {
     return;
   }
 
+  const swaggerPathFile = path.join(projectDir, ".swagger-path");
+  const branchFile = path.join(projectDir, ".target-branch");
+
+  if (options.setPath) {
+    console.log(`Setting new Swagger path to: ${options.setPath}`);
+    fs.writeFileSync(swaggerPathFile, options.setPath, "utf8");
+    console.log("Swagger path updated.");
+    return;
+  }
+
+  if (options.setBranch) {
+    console.log(`Setting new branch to: ${options.setBranch}`);
+    fs.writeFileSync(branchFile, options.setBranch, "utf8");
+    console.log("Target branch updated.");
+    return;
+  }
+
+  const savedPath = fs.existsSync(swaggerPathFile)
+    ? fs.readFileSync(swaggerPathFile, "utf8")
+    : options.path;
+
+  const targetBranch = fs.existsSync(branchFile)
+    ? fs.readFileSync(branchFile, "utf8")
+    : options.branch || "main";
+
   const workflowDir = path.join(projectDir, ".github", "workflows");
   const workflowFile = path.join(workflowDir, "api-client-bot.yml");
 
@@ -58,20 +83,30 @@ jobs:
         run: |
           yarn install
 
-      - name: Copy http-client
+      - name: Check if http-client exists
+        id: check_http_client
         run: |
-          cp ./services/api/http-client.ts ./services/api/http-client.ts.bak
+          if [ ! -f ./services/api/http-client.ts ]; then
+            echo "http-client.ts does not exist. Creating new file."
+            echo "// Generated file" > ./services/api/http-client.ts
+          else
+            echo "http-client.ts exists. Creating backup."
+            cp ./services/api/http-client.ts ./services/api/http-client.ts.bak
+          fi
 
       - name: Generate Swagger API Code
         run: |
-          npx swagger-typescript-api -p ${
-            options.path
-          } -o ./services/api --axios --modular --module-name-first-tag
+          npx swagger-typescript-api -p ${savedPath} -o ./services/api --axios --modular --module-name-first-tag
 
-      - name: Paste old http-client
+      - name: Paste old http-client if exists
         run: |
-          cp ./services/api/http-client.ts.bak ./services/api/http-client.ts
-          rm -rf ./services/api/http-client.ts.bak
+          if [ -f ./services/api/http-client.ts.bak ]; then
+            echo "Restoring old http-client.ts file."
+            cp ./services/api/http-client.ts.bak ./services/api/http-client.ts
+            rm -rf ./services/api/http-client.ts.bak
+          else
+            echo "No backup found. Using the newly generated http-client.ts file."
+          fi
 
       - name: Stage all changes
         run: |
@@ -83,8 +118,8 @@ jobs:
         run: |
           echo "Checking for changes in ./services/api"
           
-          git fetch origin ${options.branch || "main"}
-          git checkout ${options.branch || "main"}
+          git fetch origin ${targetBranch}
+          git checkout ${targetBranch}
       
           git diff --cached --quiet ./services/api || echo "Changes detected in ./services/api"
 
@@ -103,9 +138,7 @@ jobs:
             
             PR_TITLE="Update API from Swagger"
             PR_BODY="Automated update of API client code from Swagger definition."
-            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base ${
-              options.branch || "main"
-            } --head $NEW_BRANCH
+            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base ${targetBranch} --head $NEW_BRANCH
           fi
         env:
           GITHUB_TOKEN: ${token}
