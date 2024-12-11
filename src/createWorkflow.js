@@ -19,14 +19,24 @@ function createWorkflow(projectDir, options) {
     console.log(`Setting new Swagger path to: ${options.setPath}`);
     fs.writeFileSync(swaggerPathFile, options.setPath, "utf8");
     console.log("Swagger path updated.");
-    return;
+
+    return createApiClientBotWorkflow(
+      projectDir,
+      options.setPath,
+      options.branch || "main"
+    );
   }
 
   if (options.setBranch) {
     console.log(`Setting new branch to: ${options.setBranch}`);
     fs.writeFileSync(branchFile, options.setBranch, "utf8");
     console.log("Target branch updated.");
-    return;
+
+    return createApiClientBotWorkflow(
+      projectDir,
+      options.path,
+      options.setBranch
+    );
   }
 
   const savedPath = fs.existsSync(swaggerPathFile)
@@ -37,6 +47,10 @@ function createWorkflow(projectDir, options) {
     ? fs.readFileSync(branchFile, "utf8")
     : options.branch || "main";
 
+  return createApiClientBotWorkflow(projectDir, savedPath, targetBranch);
+}
+
+function createApiClientBotWorkflow(projectDir, swaggerUrl, branch) {
   const workflowDir = path.join(projectDir, ".github", "workflows");
   const workflowFile = path.join(workflowDir, "api-client-bot.yml");
 
@@ -55,7 +69,6 @@ function createWorkflow(projectDir, options) {
 
   if (onEvents.length === 0) {
     onEvents.push("pull_request");
-    return;
   }
 
   const workflowContent = `
@@ -66,7 +79,7 @@ on:
     .map(
       (event) => `${event}:
     branches:
-      - ${options.branch || "main"}`
+      - ${branch}`
     )
     .join("\n  ")}
 
@@ -100,7 +113,7 @@ jobs:
 
       - name: Generate Swagger API Code
         run: |
-          npx swagger-typescript-api -p ${savedPath} -o ./services/api --axios --modular --module-name-first-tag
+          npx swagger-typescript-api -p ${swaggerUrl} -o ./services/api --axios --modular --module-name-first-tag
 
       - name: Paste old http-client if exists
         run: |
@@ -122,8 +135,8 @@ jobs:
         run: |
           echo "Checking for changes in ./services/api"
           
-          git fetch origin ${targetBranch}
-          git checkout ${targetBranch}
+          git fetch origin ${branch}
+          git checkout ${branch}
       
           git diff --cached --quiet ./services/api || echo "Changes detected in ./services/api"
 
@@ -142,14 +155,14 @@ jobs:
             
             PR_TITLE="Update API from Swagger"
             PR_BODY="Automated update of API client code from Swagger definition."
-            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base ${targetBranch} --head $NEW_BRANCH
+            gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base ${branch} --head $NEW_BRANCH
           fi
         env:
           GITHUB_TOKEN: ${token}
 `;
 
   fs.writeFileSync(workflowFile, workflowContent, "utf8");
-  console.log("GitHub Action workflow created.");
+  console.log("GitHub Action workflow created/updated.");
 }
 
 module.exports = createWorkflow;
