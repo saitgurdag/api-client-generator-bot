@@ -38,6 +38,15 @@ function createWorkflow(projectDir, options) {
     console.log("Target branch updated.");
   }
 
+  if (options.setAction) {
+    console.log(`Setting new actions to: ${options.action}`);
+    config.onPush = options.action.includes("push");
+    config.onPullRequest = options.action.includes("pull-request");
+
+    fs.writeFileSync(configFile, JSON.stringify(config, null, 2), "utf8");
+    console.log("Actions updated.");
+  }
+
   const finalConfig = {
     path: config.path || options.path,
     branch: config.branch || options.branch || "main",
