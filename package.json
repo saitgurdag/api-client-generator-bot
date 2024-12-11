@@ -1,0 +1,15 @@
+{
+  "name": "my-github-action-package",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "my-github-action-package": "./bin/cli.js"
+  },
+  "scripts": {
+    "install": "node ./bin/cli.js install",
+    "uninstall": "node ./bin/cli.js uninstall"
+  },
+  "dependencies": {
+    "commander": "^10.0.0"
+  }
+}
