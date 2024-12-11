@@ -38,4 +38,20 @@ program
     removeWorkflow(projectDir);
   });
 
+program
+  .command("set-branch <branch>")
+  .description("Set the target branch for the workflow")
+  .action((branch) => {
+    const projectDir = process.cwd();
+    createWorkflow(projectDir, { setBranch: branch });
+  });
+
+program
+  .command("set-path <swagger-url>")
+  .description("Set the Swagger URL path for the workflow")
+  .action((swaggerUrl) => {
+    const projectDir = process.cwd();
+    createWorkflow(projectDir, { setPath: swaggerUrl });
+  });
+
 program.parse(process.argv);
