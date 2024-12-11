@@ -20,11 +20,12 @@ function createWorkflow(projectDir, options) {
     fs.writeFileSync(swaggerPathFile, options.setPath, "utf8");
     console.log("Swagger path updated.");
 
-    return createApiClientBotWorkflow(
-      projectDir,
-      options.setPath,
-      options.branch || "main"
-    );
+    return createApiClientBotWorkflow(projectDir, {
+      swaggerUrl: options.setPath,
+      branch: options.branch || "main",
+      onPush: options.onPush,
+      onPullRequest: options.onPullRequest,
+    });
   }
 
   if (options.setBranch) {
@@ -32,11 +33,12 @@ function createWorkflow(projectDir, options) {
     fs.writeFileSync(branchFile, options.setBranch, "utf8");
     console.log("Target branch updated.");
 
-    return createApiClientBotWorkflow(
-      projectDir,
-      options.path,
-      options.setBranch
-    );
+    return createApiClientBotWorkflow(projectDir, {
+      swaggerUrl: options.path,
+      branch: options.setBranch,
+      onPush: options.onPush,
+      onPullRequest: options.onPullRequest,
+    });
   }
 
   const savedPath = fs.existsSync(swaggerPathFile)
@@ -47,10 +49,18 @@ function createWorkflow(projectDir, options) {
     ? fs.readFileSync(branchFile, "utf8")
     : options.branch || "main";
 
-  return createApiClientBotWorkflow(projectDir, savedPath, targetBranch);
+  return createApiClientBotWorkflow(projectDir, {
+    swaggerUrl: savedPath,
+    branch: targetBranch,
+    onPush: options.onPush,
+    onPullRequest: options.onPullRequest,
+  });
 }
 
-function createApiClientBotWorkflow(projectDir, swaggerUrl, branch) {
+function createApiClientBotWorkflow(
+  projectDir,
+  { swaggerUrl, branch, onPush, onPullRequest }
+) {
   const workflowDir = path.join(projectDir, ".github", "workflows");
   const workflowFile = path.join(workflowDir, "api-client-bot.yml");
 
@@ -60,10 +70,10 @@ function createApiClientBotWorkflow(projectDir, swaggerUrl, branch) {
 
   let onEvents = [];
 
-  if (options.onPush) {
+  if (onPush) {
     onEvents.push("push");
   }
-  if (options.onPullRequest) {
+  if (onPullRequest) {
     onEvents.push("pull_request");
   }
 
