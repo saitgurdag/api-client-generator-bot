@@ -8,6 +8,11 @@ const program = new Command();
 program
   .command("create")
   .description("Add Api Client Generator bot to the project")
+  .option(
+    "--action <actions>",
+    "Comma-separated list of actions to trigger the workflow (e.g., push,pull-request)",
+    (value) => value.split(",")
+  )
   .option("--on-push", "Create to run on push event")
   .option("--on-pull-request", "Create to run on pull request event")
   .option("--branch <branch>", "Branch name to open PR (default: main)", "main")
@@ -22,8 +27,13 @@ program
       process.exit(1);
     }
 
-    if (!options.onPush && !options.onPullRequest) {
+    if (!options.onPush && !options.onPullRequest && !options.action) {
       options.onPullRequest = true;
+    }
+
+    if (options.action) {
+      options.onPush = options.action.includes("push");
+      options.onPullRequest = options.action.includes("pull-request");
     }
 
     const projectDir = process.cwd();

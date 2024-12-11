@@ -38,12 +38,17 @@ function createWorkflow(projectDir, options) {
     console.log("Target branch updated.");
   }
 
-  createApiClientBotWorkflow(projectDir, {
+  const finalConfig = {
     path: config.path || options.path,
     branch: config.branch || options.branch || "main",
-    onPush: config.onPush || options.onPush,
-    onPullRequest: config.onPullRequest || options.onPullRequest,
-  });
+    onPush: options.onPush !== undefined ? options.onPush : config.onPush,
+    onPullRequest:
+      options.onPullRequest !== undefined
+        ? options.onPullRequest
+        : config.onPullRequest,
+  };
+
+  createApiClientBotWorkflow(projectDir, finalConfig);
 }
 
 function createApiClientBotWorkflow(
