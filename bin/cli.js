@@ -41,26 +41,16 @@ program
   });
 
 program
-  .command("set-action")
+  .command("set-actions")
   .description("Set the actions (push, pull-request) for the workflow")
-  .option(
-    "--action <actions>",
-    "Comma-separated list of actions to trigger the workflow (e.g., push,pull-request)",
-    (value) => value.split(",")
-  )
-  .action((options) => {
-    if (!options.action) {
-      console.error(
-        "You must specify at least one action (push or pull-request)."
-      );
-      process.exit(1);
-    }
+  .action(() => {
+    const options = {
+      setAction: true,
+      action: ["pull-request"], // Default action
+    };
 
     const projectDir = process.cwd();
-    createWorkflow(projectDir, {
-      setAction: true,
-      action: options.action,
-    });
+    createWorkflow(projectDir, options);
   });
 
 program
