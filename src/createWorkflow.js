@@ -151,7 +151,7 @@ jobs:
 `;
 
   fs.writeFileSync(workflowFile, workflowContent, "utf8");
-  console.log("GitHub Action workflow created/updated.");
+  console.log("Api-Client bot created/updated.");
 }
 
 module.exports = createWorkflow;
