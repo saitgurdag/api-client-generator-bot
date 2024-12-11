@@ -3,42 +3,52 @@ const path = require("path");
 const { ensureDirectoryExists } = require("./workflowHelpers");
 
 function createWorkflow(projectDir, options) {
-  const swaggerPathFile = path.join(projectDir, ".swagger-path");
-  const branchFile = path.join(projectDir, ".target-branch");
+  const configFile = path.join(projectDir, "api-client-bot-configs.json");
 
-  let savedPath = fs.existsSync(swaggerPathFile)
-    ? fs.readFileSync(swaggerPathFile, "utf8")
-    : options.path;
+  if (!fs.existsSync(configFile)) {
+    fs.writeFileSync(
+      configFile,
+      JSON.stringify(
+        {
+          path: "",
+          branch: "main",
+          onPush: false,
+          onPullRequest: true,
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
+  }
 
-  let targetBranch = fs.existsSync(branchFile)
-    ? fs.readFileSync(branchFile, "utf8")
-    : options.branch || "main";
+  const config = JSON.parse(fs.readFileSync(configFile, "utf8"));
 
   if (options.setPath) {
     console.log(`Setting new Swagger path to: ${options.setPath}`);
-    fs.writeFileSync(swaggerPathFile, options.setPath, "utf8");
+    config.path = options.setPath;
+    fs.writeFileSync(configFile, JSON.stringify(config, null, 2), "utf8");
     console.log("Swagger path updated.");
-    savedPath = options.setPath;
   }
 
   if (options.setBranch) {
     console.log(`Setting new branch to: ${options.setBranch}`);
-    fs.writeFileSync(branchFile, options.setBranch, "utf8");
+    config.branch = options.setBranch;
+    fs.writeFileSync(configFile, JSON.stringify(config, null, 2), "utf8");
     console.log("Target branch updated.");
-    targetBranch = options.setBranch;
   }
 
   createApiClientBotWorkflow(projectDir, {
-    swaggerUrl: savedPath,
-    branch: targetBranch,
-    onPush: options.onPush,
-    onPullRequest: options.onPullRequest,
+    path: config.path || options.path,
+    branch: config.branch || options.branch || "main",
+    onPush: config.onPush || options.onPush,
+    onPullRequest: config.onPullRequest || options.onPullRequest,
   });
 }
 
 function createApiClientBotWorkflow(
   projectDir,
-  { swaggerUrl, branch, onPush, onPullRequest }
+  { path, branch, onPush, onPullRequest }
 ) {
   const workflowDir = path.join(projectDir, ".github", "workflows");
   const workflowFile = path.join(workflowDir, "api-client-bot.yml");
@@ -102,7 +112,7 @@ jobs:
 
       - name: Generate Swagger API Code
         run: |
-          npx swagger-typescript-api -p ${swaggerUrl} -o ./services/api --axios --modular --module-name-first-tag
+          npx swagger-typescript-api -p ${path} -o ./services/api --axios --modular --module-name-first-tag
 
       - name: Paste old http-client if exists
         run: |
