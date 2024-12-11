@@ -48,7 +48,7 @@ function createWorkflow(projectDir, options) {
 
 function createApiClientBotWorkflow(
   projectDir,
-  { path, branch, onPush, onPullRequest }
+  { path: swaggerPath, branch, onPush, onPullRequest }
 ) {
   const workflowDir = path.join(projectDir, ".github", "workflows");
   const workflowFile = path.join(workflowDir, "api-client-bot.yml");
@@ -112,7 +112,7 @@ jobs:
 
       - name: Generate Swagger API Code
         run: |
-          npx swagger-typescript-api -p ${path} -o ./services/api --axios --modular --module-name-first-tag
+          npx swagger-typescript-api -p ${swaggerPath} -o ./services/api --axios --modular --module-name-first-tag
 
       - name: Paste old http-client if exists
         run: |
