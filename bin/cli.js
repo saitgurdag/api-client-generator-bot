@@ -41,16 +41,34 @@ program
   });
 
 program
-  .command("set-actions")
+  .command("set-actions <action>")
   .description("Set the actions (push, pull-request) for the workflow")
-  .action(() => {
-    const options = {
+  .action((action) => {
+    const actions = action.split(",");
+
+    const validActions = ["push", "pull-request"];
+    const setActions = {
       setAction: true,
-      action: ["pull-request"], // Default action
+      action: [],
     };
 
+    actions.forEach((a) => {
+      if (validActions.includes(a.trim())) {
+        setActions.action.push(a.trim());
+      } else {
+        console.error(
+          `Invalid action: ${a.trim()}. Valid actions are 'push' and 'pull-request'.`
+        );
+        process.exit(1);
+      }
+    });
+
+    if (setActions.action.length === 0) {
+      setActions.action.push("pull-request");
+    }
+
     const projectDir = process.cwd();
-    createWorkflow(projectDir, options);
+    createWorkflow(projectDir, setActions);
   });
 
 program
