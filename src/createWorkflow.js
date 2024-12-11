@@ -60,7 +60,7 @@ name: api-client-bot
 on:
   ${onEvents
     .map(
-      (event) => `  ${event}:
+      (event) => `${event}:
     branches:
       - ${options.branch || "main"}`
     )
