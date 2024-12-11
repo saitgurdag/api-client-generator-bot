@@ -3,53 +3,32 @@ const path = require("path");
 const { ensureDirectoryExists } = require("./workflowHelpers");
 
 function createWorkflow(projectDir, options) {
-  if (
-    !options.setPath &&
-    !options.setBranch &&
-    (!options.path || options.path === "")
-  ) {
-    console.log("Swagger URL (--path) cannot be empty.");
-    return;
-  }
-
   const swaggerPathFile = path.join(projectDir, ".swagger-path");
   const branchFile = path.join(projectDir, ".target-branch");
+
+  let savedPath = fs.existsSync(swaggerPathFile)
+    ? fs.readFileSync(swaggerPathFile, "utf8")
+    : options.path;
+
+  let targetBranch = fs.existsSync(branchFile)
+    ? fs.readFileSync(branchFile, "utf8")
+    : options.branch || "main";
 
   if (options.setPath) {
     console.log(`Setting new Swagger path to: ${options.setPath}`);
     fs.writeFileSync(swaggerPathFile, options.setPath, "utf8");
     console.log("Swagger path updated.");
-
-    return createApiClientBotWorkflow(projectDir, {
-      swaggerUrl: options.setPath,
-      branch: options.branch || "main",
-      onPush: options.onPush,
-      onPullRequest: options.onPullRequest,
-    });
+    savedPath = options.setPath;
   }
 
   if (options.setBranch) {
     console.log(`Setting new branch to: ${options.setBranch}`);
     fs.writeFileSync(branchFile, options.setBranch, "utf8");
     console.log("Target branch updated.");
-
-    return createApiClientBotWorkflow(projectDir, {
-      swaggerUrl: options.path,
-      branch: options.setBranch,
-      onPush: options.onPush,
-      onPullRequest: options.onPullRequest,
-    });
+    targetBranch = options.setBranch;
   }
 
-  const savedPath = fs.existsSync(swaggerPathFile)
-    ? fs.readFileSync(swaggerPathFile, "utf8")
-    : options.path;
-
-  const targetBranch = fs.existsSync(branchFile)
-    ? fs.readFileSync(branchFile, "utf8")
-    : options.branch || "main";
-
-  return createApiClientBotWorkflow(projectDir, {
+  createApiClientBotWorkflow(projectDir, {
     swaggerUrl: savedPath,
     branch: targetBranch,
     onPush: options.onPush,
