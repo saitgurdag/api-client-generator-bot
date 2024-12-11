@@ -6,7 +6,7 @@ const removeWorkflow = require("../src/removeWorkflow");
 const program = new Command();
 
 program
-  .command("install")
+  .command("create")
   .description("Add Api Client Generator bot to the project")
   .option("--on-push", "Create to run on push event")
   .option("--on-pull-request", "Create to run on pull request event")
@@ -31,7 +31,7 @@ program
   });
 
 program
-  .command("uninstall")
+  .command("remove")
   .description("Remove the api client generator bot from the project.")
   .action(() => {
     const projectDir = process.cwd();

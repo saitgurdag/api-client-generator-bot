@@ -9,8 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish",
-    "install": "node ./bin/cli.js install",
-    "uninstall": "node ./bin/cli.js uninstall"
+    "create-api-client-bot": "node ./bin/cli.js install",
+    "remove-api-client-bot": "node ./bin/cli.js uninstall"
   },
   "keywords": [
     "github-actions",
