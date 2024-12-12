@@ -1,7 +1,7 @@
 {
   "name": "api-client-generator-bot",
   "description": "A package to create GitHub Actions Bot for generating API client code from Swagger definition.",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "main": "index.js",
   "bin": {
     "api-client-generator-bot": "bin/cli.js"
