@@ -121,6 +121,10 @@ Once the bot is added, your GitHub repository will include a workflow file like 
 
 The workflow is triggered based on the events (push, pull-request) you configure, automatically updating your API client code based on the Swagger definition.
 
+## Acknowledgments
+
+A big thank you to the [swagger-typescript-api](https://www.npmjs.com/package/swagger-typescript-api) package for providing a seamless solution to generate TypeScript-based API clients from Swagger definitions. This package is an integral part of the API Client Generator bot workflow.
+
 ## License
 
 MIT License. See the LICENSE file for more information.
