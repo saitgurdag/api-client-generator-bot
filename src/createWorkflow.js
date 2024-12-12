@@ -49,7 +49,7 @@ function createWorkflow(projectDir, options) {
 
   const finalConfig = {
     path: config.path || options.path,
-    branch: config.branch || options.branch || "main",
+    branch: options.branch || config.branch || "main",
     onPush: options.onPush !== undefined ? options.onPush : config.onPush,
     onPullRequest:
       options.onPullRequest !== undefined
