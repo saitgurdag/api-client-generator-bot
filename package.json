@@ -12,11 +12,18 @@
     "create-api-client-bot": "node ./bin/cli.js add",
     "remove-api-client-bot": "node ./bin/cli.js remove"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saitgurdag/api-client-generator-bot.git"
+  },
   "keywords": [
     "github-actions",
     "swagger",
     "workflow",
-    "api-client"
+    "api-client",
+    "react",
+    "react-native",
+    "expo"
   ],
   "author": "saitgurdag",
   "license": "MIT",
