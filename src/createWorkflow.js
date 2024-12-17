@@ -163,7 +163,7 @@ jobs:
             git config --global user.email 'actions@github.com'
             git checkout -b $NEW_BRANCH
             git add ./services/api
-            git commit -m "feat(swagger): update API code from Swagger"
+            git commit -m "feat(swagger): update API code from Swagger" --no-verify
             git push origin $NEW_BRANCH
             
             PR_TITLE="Update API from Swagger"
