@@ -115,8 +115,8 @@ Once the bot is added, your GitHub repository will include a workflow file like 
 
 ```markdown
 .github/
-└── workflows/
-└── api-client-bot.yml
+  └── workflows/
+    └── api-client-bot.yml
 ```
 
 The workflow is triggered based on the events (push, pull-request) you configure, automatically updating your API client code based on the Swagger definition.
